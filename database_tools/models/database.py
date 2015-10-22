@@ -37,16 +37,16 @@ class db_database(models.Model):
         required=True,
         default='self',
         )
-    syncked_backup_path = fields.Char(
-        string='Sincked Backup Path',
-        default='/var/odoo/backups/syncked/',
+    synced_backup_path = fields.Char(
+        string='Sync Backup Path',
+        default='/var/lib/odoo/backups/synced/',
         help='If defined, after each backup, a copy backup with database name\
         as file name, will be saved on this folder'
         )
     backups_path = fields.Char(
         string='Backups Path',
         required=True,
-        default='/var/odoo/backups/',
+        default='/var/lib/odoo/backups/',
         help='User running this odoo intance must have CRUD access rights on\
         this folder'
         # TODO agregar boton para probar que se tiene permisos
@@ -426,30 +426,30 @@ class db_database(models.Model):
                         self.backup_next_date = new_date
 
                     # TODO check gdrive backup pat
-                    if self.syncked_backup_path:
+                    if self.synced_backup_path:
                         # so no existe el path lo creamos
                         try:
                             if not os.path.isdir(
-                                    self.syncked_backup_path):
+                                    self.synced_backup_path):
                                 _logger.info(
-                                    'Creating syncked backup folder')
-                                os.makedirs(self.syncked_backup_path)
+                                    'Creating synced backup folder')
+                                os.makedirs(self.synced_backup_path)
                         except Exception, e:
                             error = (
                                 "Could not create folder %s for backups.\
                                 This is what we get:\n\
-                                %s" % (self.syncked_backup_path, e))
+                                %s" % (self.synced_backup_path, e))
                             _logger.warning(error)
 
                         # now we copy the backup
-                        _logger.info('Make backup a copy con syncked path')
+                        _logger.info('Make backup a copy con synced path')
                         try:
-                            syncked_backup = os.path.join(
-                                self.syncked_backup_path,
+                            synced_backup = os.path.join(
+                                self.synced_backup_path,
                                 self.name + '.%s' % backup_format)
-                            shutil.copy2(backup_path, syncked_backup)
+                            shutil.copy2(backup_path, synced_backup)
                         except Exception, e:
-                            error = "Could not copy into syncked folder.\
+                            error = "Could not copy into synced folder.\
                                 This is what we get:\n\
                                 %s" % (e)
                             _logger.warning(error)

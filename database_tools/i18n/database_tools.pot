@@ -155,7 +155,7 @@ msgid "ID"
 msgstr ""
 
 #. module: database_tools
-#: help:db.database,syncked_backup_path:0
+#: help:db.database,synced_backup_path:0
 msgid "If defined, after each backup, a copy backup with database name        as file name, will be saved on this folder"
 msgstr ""
 
@@ -250,8 +250,8 @@ msgid "Self"
 msgstr ""
 
 #. module: database_tools
-#: field:db.database,syncked_backup_path:0
-msgid "Sincked Backup Path"
+#: field:db.database,synced_backup_path:0
+msgid "Sync Backup Path"
 msgstr ""
 
 #. module: database_tools
