@@ -42,7 +42,7 @@
                             <group>
                                 <field name="type"/>
                                 <field name="backups_path"/>
-                                <field name="syncked_backup_path"/>
+                                <field name="synced_backup_path"/>
                             </group>
                             <group>
                                 <field name="backup_format"/>
