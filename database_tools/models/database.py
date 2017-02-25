@@ -316,8 +316,9 @@ class db_database(models.Model):
                 backups_paths))
             for directory in os.listdir(db.backups_path):
                 if directory not in backups_paths:
-                    self.remove_directory(
-                        os.path.join(db.backups_path, directory))
+                    pass
+                    # self.remove_directory(
+                    #    os.path.join(db.backups_path, directory))
 
     @api.model
     def remove_directory(self, directory):
@@ -326,7 +327,7 @@ class db_database(models.Model):
             _logger.info('File %s removed succesfully' % directory)
         except Exception, e:
             _logger.warning(
-                'Unable to remoove database file on %s, '
+                'Unable to remove database file on %s, '
                 'this is what we get:\n'
                 '%s' % (directory, e.strerror))
 
