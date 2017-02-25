@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-#    Copyright (C) 2015  ADHOC SA  (http://www.adhoc.com.ar)
+#    Copyright (C) 2015  BMYA SA  (http://blancomartin.com.ar)
+#    Copyright (C) 2015  Blanco Martin & Asociados (http://blancomartin.cl)
 #    All Rights Reserved.
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -19,19 +20,18 @@
 #
 ##############################################################################
 {
-    'name': 'Support branding ADHOC',
+    'name': 'Support branding BMYA',
     'version': '8.0.1.0.0',
     'category': 'Support',
     'sequence': 14,
     'summary': '',
-    'description': """
-Support branding ADHOC
+    'description': u"""
+Support branding BMYA
 ======================
-Set parameter for adhoc support branding
+Set parameter for Blanco Martín & Asociados support branding
     """,
-    'author':  'ADHOC SA',
-    'website': 'www.adhoc.com.ar',
-    'license': 'AGPL-3',
+    'author':  'Blanco Martin & Asociados',
+    'website': 'blancomartin.cl',
     'images': [
     ],
     'depends': [
