@@ -4,54 +4,88 @@
 # directory
 ##############################################################################
 from openerp import models, fields, api
-from openerp.addons.adhoc_modules.models.ir_module import uninstallables
-# from openerp.exceptions import Warning
-# from datetime import datetime
-# from datetime import date
-# from dateutil.relativedelta import relativedelta
+import logging
+_logger = logging.getLogger(__name__)
 
 
 class database_tools_configuration(models.TransientModel):
     _inherit = 'db.configuration'
 
-    # @api.model
-    # def _get_adhoc_modules_state(self):
-    #     return self.env[
-    #         'ir.module.module'].get_overall_adhoc_modules_state()['state']
-
     @api.one
-    # dummy depends son computed field is computed
+    # dummy depends to get initial data
     @api.depends('backups_state')
     def get_adhoc_modules_data(self):
-        uninstalled_modules_names = self.env['ir.module.module'].search([
-            ('state', 'not in', ['installed', 'to install'])]).mapped('name')
-        auto_install_modules = self.env['ir.module.module'].search([
-            # '|', ('dependencies_id', '=', False),
-            ('dependencies_id.name', 'not in', uninstalled_modules_names),
-            ('conf_visibility', '=', 'auto_install'),
-            ('state', '=', 'uninstalled'),
-        ])
-        self.adhoc_modules_to_install = auto_install_modules
-        self.adhoc_modules_to_uninstall = self.env['ir.module.module'].search([
-            ('conf_visibility', 'in', uninstallables),
-            # ('conf_visibility', 'in', []),
-            ('state', '=', 'installed'),
-        ])
+        modules = self.env['ir.module.module']
+        self.installed_uninstallable_modules = (
+            modules._get_installed_uninstallable_modules())
+        self.installed_uncontracted_modules = (
+            modules._get_installed_uncontracted_modules())
+        self.not_installed_autoinstall_modules = (
+            modules._get_not_installed_autoinstall_modules())
+        self.not_installed_by_category_modules = (
+            modules._get_not_installed_by_category_modules())
 
-    adhoc_modules_to_uninstall = fields.Many2many(
+    installed_uninstallable_modules = fields.Many2many(
         'ir.module.module',
         compute='get_adhoc_modules_data',
+        string='Installed Uninstallable',
     )
-    adhoc_modules_to_install = fields.Many2many(
+    installed_uncontracted_modules = fields.Many2many(
         'ir.module.module',
         compute='get_adhoc_modules_data',
+        string='Installed Uncontracted',
     )
-    # adhoc_modules_state = fields.Selection([
-    #     ('should_not_be_installed', 'Should Not be Installed'),
-    #     ('installation_required', 'Installation Required'),
-    #     ('ok', 'Ok'),
-    # ],
-    #     'Update Status',
-    #     readonly=True,
-    #     default=_get_adhoc_modules_state,
-    # )
+    not_installed_autoinstall_modules = fields.Many2many(
+        'ir.module.module',
+        compute='get_adhoc_modules_data',
+        string='Not Installed Auto-Install',
+    )
+    not_installed_by_category_modules = fields.Many2many(
+        'ir.module.module',
+        compute='get_adhoc_modules_data',
+        string='Not Installed by Categories',
+    )
+
+    @api.multi
+    def set_to_install_auto_install_modules(self):
+        self.ensure_one()
+        _logger.info('Setting to install auto install modules')
+        return self.not_installed_autoinstall_modules._set_to_install()
+
+    @api.multi
+    def button_uninstall_uninstallable(self):
+        self.ensure_one()
+        _logger.info('Setting to uninstall uninstallable modules')
+        return self.installed_uninstallable_modules._set_to_uninstall()
+        # return self.installed_uninstallable_modules.button_uninstall()
+
+    update_state = fields.Selection(
+        selection_add=[
+            ('installed_uninstallable', 'Installed Uninstallable'),
+            ('installed_uncontracted', 'Installed Uncontracted'),
+            ('uninstalled_auto_install', 'Uninstalled Auto Install'),
+        ]
+    )
+
+    @api.multi
+    def set_to_install_unmet_deps(self):
+        """
+        We inherit this function to install auto install modules
+        """
+        res = super(
+            database_tools_configuration, self).set_to_install_unmet_deps()
+        _logger.info('Fixing auto install modules by adhoc modules')
+        self.not_installed_autoinstall_modules.sudo()._set_to_install()
+        return res
+
+    @api.multi
+    def set_to_uninstall_not_installable_modules(self):
+        """
+        We inherit this function to install auto install modules
+        """
+        res = super(
+            database_tools_configuration,
+            self).set_to_uninstall_not_installable_modules()
+        _logger.info('Fixing not installable modules by adhoc modules')
+        self.installed_uninstallable_modules.sudo()._set_to_uninstall()
+        return res

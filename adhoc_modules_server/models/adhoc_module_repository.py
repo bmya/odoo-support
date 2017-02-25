@@ -8,6 +8,7 @@ from openerp.modules.module import adapt_version
 from openerp.exceptions import Warning
 from openerp.addons.adhoc_modules_server.octohub.connection import Connection
 # from octohub.connection import Connection
+from openerp.addons.server_mode.mode import get_mode
 from openerp.tools.parse_version import parse_version
 import base64
 import logging
@@ -71,6 +72,7 @@ def load_information_from_contents(
 class AdhocModuleRepository(models.Model):
     _name = 'adhoc.module.repository'
     _inherit = ['mail.thread']
+    _rec_name = 'display_name'
 
     user = fields.Char(
         'User or Organization',
@@ -108,6 +110,19 @@ class AdhocModuleRepository(models.Model):
         string='Sequence',
         default=10,
     )
+    display_name = fields.Char(
+        compute='get_display_name',
+        store=True,
+    )
+
+    @api.one
+    @api.depends('user', 'name', 'branch')
+    def get_display_name(self):
+        self.display_name = "%s/%s:%s" % (
+            self.user or '',
+            self.name or '',
+            self.branch or '',
+        )
 
     @api.multi
     def get_token(self):
@@ -170,7 +185,8 @@ class AdhocModuleRepository(models.Model):
     @api.multi
     def get_module_vals(self, info):
         self.ensure_one()
-        return {
+
+        vals = {
             'description': info.get('description', ''),
             'shortdesc': info.get('name', ''),
             'author': info.get('author', 'Unknown'),
@@ -179,15 +195,39 @@ class AdhocModuleRepository(models.Model):
             'website': info.get('website', ''),
             'license': info.get('license', 'AGPL-3'),
             'sequence': info.get('sequence', 100),
+            # 'new_sequence': info.get('sequence', 100),
             'application': info.get('application', False),
             'auto_install': info.get('auto_install', False),
             'icon': info.get('icon', False),
             'summary': info.get('summary', ''),
         }
+        # TODO faltaria ver si lo reseteamos si no es mas auto_install
+        if info.get('auto_install', False):
+            vals['conf_visibility'] = 'auto_install_by_code'
+        return vals
+
+    @api.model
+    def _cron_scan_repositories(self):
+        if get_mode():
+            _logger.info(
+                'Scan repositories is disable by server_mode. '
+                'If you want to enable it you should remove develop or test '
+                'value for server_mode key on openerp server config file')
+            return False
+        for repository in self.search([('auto_update', '=', True)]):
+            try:
+                repository.scan_repository()
+                self._cr.commit()
+            except:
+                # TODO we should set a last update in each repository and
+                # make cron run more frequently
+                _logger.error("Error updating repository %s" % (
+                    repository.name))
 
     @api.multi
     def scan_repository(self):
         self.ensure_one()
+        _logger.info("Scaning repository %s" % (self.name))
         res = [0, 0]    # [update, add]
         errors = []
 
@@ -213,6 +253,10 @@ class AdhocModuleRepository(models.Model):
                     _logger.warning(msg)
                     continue
                 updated_values = {}
+                # if mod alread y exist, we pop new_sequence value because
+                # we dont want to update it
+                values.pop('sequence')
+                # values.pop('new_sequence')
                 for key in values:
                     old = getattr(mod, key)
                     updated = isinstance(
@@ -220,9 +264,10 @@ class AdhocModuleRepository(models.Model):
                         values[key]) or values[key]
                     if (old or updated) and updated != old:
                         updated_values[key] = values[key]
-                if module_info.get(
-                        'installable', True) and mod.state == 'uninstallable':
-                    updated_values['state'] = 'uninstalled'
+                # we do not use state
+                # if module_info.get(
+                #         'installable', True) and mod.state == 'uninstallable':
+                #     updated_values['state'] = 'uninstalled'
                 if parse_version(module_info.get(
                         'version', default_version)) > parse_version(
                         mod.latest_version or default_version):
@@ -236,7 +281,7 @@ class AdhocModuleRepository(models.Model):
                         'installable', True):
                     continue
                 mod = mod.create(dict(
-                    name=mod_name, state='uninstalled',
+                    name=mod_name,
                     repository_id=self.id, **values))
                 res[1] += 1
             mod._update_dependencies(module_info.get('depends', []))

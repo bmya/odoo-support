@@ -8,19 +8,26 @@
     <field name="model">db.configuration</field>
     <field name="inherit_id" ref="database_tools.view_db_configuration"/>
     <field name="arch" type="xml">
-        <label for="backups_state" position="before">
-            <label for="adhoc_modules_to_uninstall"/>
+        <group string="Modules">
+            <label for="installed_uninstallable_modules"/>
             <div>
-                <field name="adhoc_modules_to_uninstall" class="oe_inline" widget="many2many_tags"/>
+                <field name="installed_uninstallable_modules" class="oe_inline" widget="many2many_tags"/>
+                <button name="button_uninstall_uninstallable" type="object" class="oe_link oe_inline" string="Set To Uninstall" attrs="{'invisible': [('installed_uninstallable_modules', '=', [(6, False, [])])]}"/>
             </div>
-            <label for="adhoc_modules_to_install"/>
+            <label for="installed_uncontracted_modules"/>
             <div>
-                <field name="adhoc_modules_to_install" class="oe_inline" widget="many2many_tags"/>
-                <!-- <button name="action_fix_db" attrs="{'invisible': [('update_state', 'in', ['not_installable', 'ok'])]}" string="Fix DB" type="object" class="oe_inline"/> -->
-                <!-- <button name="action_fix_db" attrs="{'invisible': [('update_state', '!=', 'not_installable')]}" string="Fix DB (WARNING with 'Not Installable Modules')" class="oe_highlight oe_inline" type="object" confirm="WARNING!! All modules with state 'Not Installable Modules' will be completely deleted and related data will be lost. CHECK if you want them and are some repositories missing. Do you wan to continue?"/> -->
-                <!-- <field name="update_detail"/> -->
+                <field name="installed_uncontracted_modules" class="oe_inline" widget="many2many_tags"/>
             </div>
-        </label>
+            <label for="not_installed_autoinstall_modules"/>
+            <div>
+                <field name="not_installed_autoinstall_modules" class="oe_inline" widget="many2many_tags"/>
+                <button name="set_to_install_auto_install_modules" type="object" class="oe_link oe_inline" string="Set To Install" attrs="{'invisible': [('not_installed_autoinstall_modules', '=', [(6, False, [])])]}"/>
+            </div>
+            <label for="not_installed_by_category_modules"/>
+            <div>
+                <field name="not_installed_by_category_modules" class="oe_inline" widget="many2many_tags"/>
+            </div>
+        </group>
     </field>
 </record>
 

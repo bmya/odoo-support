@@ -36,7 +36,7 @@ class BaseModulePreUpgrade(models.TransientModel):
         if not db:
             raise Warning(_(
                 'No Database "Self" found on Database Tools Databses'))
-        db.action_database_backup()
+        db.database_backup()
         self.recent_backup = True
         return {
             'type': 'ir.actions.act_window',
@@ -44,4 +44,17 @@ class BaseModulePreUpgrade(models.TransientModel):
             'res_id': self.id,
             'view_mode': 'form',
             'target': 'new',
+        }
+
+    @api.multi
+    def upgrade_module(self):
+        super(BaseModulePreUpgrade, self).upgrade_module()
+        # retornamos reload en vez de solo cerrar ventana
+        # reload the client; open the first available root menu
+        menu = self.env['ir.ui.menu'].search(
+            [('parent_id', '=', False)], limit=1)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+            'params': {'menu_id': menu.id}
         }

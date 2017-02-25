@@ -19,16 +19,17 @@
 #
 ##############################################################################
 {
-    "name": "ADHOC Modules",
-    "version": "8.0.0.0.0",
-    'author':  'ADHOC SA',
+    "name": "ADHOC Modules Server",
+    "version": "8.0.0.10.0",
+    'author': 'ADHOC SA',
     'website': 'www.adhoc.com.ar',
     'license': 'AGPL-3',
     'depends': [
         'adhoc_modules',
-        'mass_editing',
         'web_support_server',
-        ],
+        # we add lines sequence to add order in lines
+        'account_contract_lines_sequence',
+    ],
     # 'external_dependencies': {
     #     'python': ['octuhub']
     #     },
@@ -36,10 +37,19 @@
         'views/adhoc_module_repository_view.xml',
         'views/adhoc_module_category_view.xml',
         'views/adhoc_module_view.xml',
+        'views/product_template_view.xml',
+        'views/product_product_view.xml',
+        'views/account_analytic_account_view.xml',
         'security/ir.model.access.csv',
-        'data/mass_editting_data.xml',
-        ],
-    'demo': [],
+        'data/cron_data.xml',
+        'data/server_acion_data.xml',
+    ],
+    'demo': [
+        'demo/product_demo.xml',
+        'demo/adhoc_module_repository_demo.xml',
+        'demo/adhoc_module_category_server.xml',
+        'demo/adhoc.module.module.csv',
+    ],
     'test': [],
     'installable': True,
     'active': False,

@@ -20,14 +20,16 @@
 ##############################################################################
 {
     "name": "ADHOC Modules",
-    "version": "8.0.0.0.0",
+    "version": "8.0.0.13.0",
     'author': 'ADHOC SA',
     'website': 'www.adhoc.com.ar',
     'license': 'AGPL-3',
     'depends': [
-        # module to fetch modules info
         'web_support_client',
         'database_tools',
+        'base',
+        # we add dependency to server_mode to enable or disable installation
+        'server_mode',
     ],
     'external_dependencies': {
     },
@@ -36,8 +38,11 @@
         'views/adhoc_module_view.xml',
         'views/support_view.xml',
         'views/db_configuration_view.xml',
+        # 'views/templates.xml',
         'wizard/module_upgrade_view.xml',
+        'wizard/base_module_pre_install_view.xml',
         'security/ir.model.access.csv',
+        'data/cron_data.xml',
     ],
     'demo': [],
     'test': [],

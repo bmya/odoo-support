@@ -19,34 +19,21 @@
 #
 ##############################################################################
 {
-    "name": "Database Tools",
-    "version": "8.0.2.2.5",
+    'name': 'Database Tools',
+    'version': "8.0.2.6.0",
     'author': 'ADHOC SA',
     'website': 'www.adhoc.com.ar',
     'license': 'AGPL-3',
-    # "category": "Accounting",
-    "description": """
-Database Tools
-==============
-TODO
-
-Backups automaticos
--------------------
-Para que se hagan backups al hacer fix on con el cron, se requiere:
-1. Que no haya server mode definido
-2. Que haya un parametro database.backups.enable = 'True'
-
-Por defecto, al instalar el modulo, los backups estan desactivados creando el
-parametro "database.backups.enable" con falor False
-    """,
+    'category': "Extra Tools",
     'depends': [
         'server_mode',
-        # 'database_cleanup',
+        'base',
     ],
     'external_dependencies': {
         'python': ['fabric']
     },
     'data': [
+        'wizard/db_database_backup_now_wizard_view.xml',
         'views/database_backup_view.xml',
         'views/database_view.xml',
         'views/database_preserve_view.xml',
@@ -59,7 +46,5 @@ parametro "database.backups.enable" con falor False
     'demo': [],
     'test': [],
     'installable': True,
-    'active': False,
     'auto_install': True
 }
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -10,8 +10,10 @@
             <field name="arch" type="xml">
                 <header>
                     <button name="get_adhoc_modules_data" string="Refresh ADHOC Modules Data" type="object"/>
+                    <button name="get_adhoc_modules_data" string="Refresh Contracted Products" context="{'only_contract_info': True}" type="object"/>
                 </header>
             </field>
         </record>
+
     </data>
 </openerp>
