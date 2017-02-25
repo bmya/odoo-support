@@ -38,8 +38,8 @@ class db_database(models.Model):
         default='self',
     )
     syncked_backup_path = fields.Char(
-        string='Sincked Backup Path',
-        default='/var/odoo/backups/syncked/',
+        string='Sinced Backup Path',
+        default='/var/odoo/backups/synced/',
         help='If defined, after each backup, a copy backup with database name '
         'as file name, will be saved on this folder'
     )
@@ -311,6 +311,7 @@ class db_database(models.Model):
             # if not db.remove_unlisted_files:
             #     continue
             backups_paths = db.mapped('backup_ids.name')
+            _logger.info('-------#####------- backup paths: {}'.format(backup_paths))
             for directory in os.listdir(db.backups_path):
                 if directory not in backups_paths:
                     self.remove_directory(
