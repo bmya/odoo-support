@@ -310,7 +310,8 @@ class db_database(models.Model):
             # if not db.remove_unlisted_files:
             #     continue
             backups_paths = db.mapped('backup_ids.name')
-            _logger.info('-------#####------- backup paths: {}'.format(backup_paths))
+            _logger.info('-------#####------- backup paths: {}'.format(
+                backups_paths))
             for directory in os.listdir(db.backups_path):
                 if directory not in backups_paths:
                     self.remove_directory(
