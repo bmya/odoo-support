@@ -191,6 +191,8 @@ class db_database(models.Model):
         """Check if backups exists on filesystem, if not, unlink records"""
         for backup in self.backup_ids:
             if not os.path.isfile(backup.full_path):
+                _logger.info('aca pasa por update backups data: {}'.format(
+                    backup))
                 backup.unlink()
         return True
 
@@ -337,6 +339,7 @@ class db_database(models.Model):
         ]
         to_delete_backups = self.env['db.database.backup'].search(
             domain)
+        _logger.info('aca pasa por to_delete {}'.format(to_delete_backups))
         to_delete_backups.unlink()
 
     @api.one
@@ -384,6 +387,8 @@ class db_database(models.Model):
         # to_delete_backups.unlink()
         # we make a loop to commit after each delete
         for backup in to_delete_backups:
+            _logger.info('aca pasa por lina 387 y hace unlink: {}'.format(
+                backup))
             backup.unlink()
             backup._cr.commit()
         return True
